@@ -71,6 +71,50 @@ async def upload_report(
     )
 
 
+@router.get("/export-summary")
+async def export_health_summary(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Export complete health summary as PDF
+    """
+    try:
+        # Get user's reports and logs
+        reports = await HealthReport.find(
+            HealthReport.user_id == str(current_user.id)
+        ).sort("-report_date").to_list()
+        
+        logs = await HealthLog.find(
+            HealthLog.user_id == str(current_user.id)
+        ).sort("-log_date").limit(30).to_list()
+        
+        # Generate PDF
+        pdf_bytes = PDFService.generate_health_summary(
+            user=current_user,
+            reports=reports,
+            logs=logs
+        )
+        
+        # Return as downloadable file
+        filename = f"health_summary_{current_user.full_name.replace(' ', '_')}_{datetime.utcnow().strftime('%Y%m%d')}.pdf"
+        
+        return StreamingResponse(
+            io.BytesIO(pdf_bytes),
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}"
+            }
+        )
+    except Exception as e:
+        print(f"Error generating PDF: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate health report: {str(e)}"
+        )
+
+
 @router.get("/", response_model=List[ReportResponse])
 async def get_my_reports(
     report_type: Optional[ReportType] = None,
@@ -215,38 +259,3 @@ async def delete_report(
     await report.delete()
     
     return {"message": "Report deleted successfully"}
-
-
-@router.get("/export-summary")
-async def export_health_summary(
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Export complete health summary as PDF
-    """
-    # Get user's reports and logs
-    reports = await HealthReport.find(
-        HealthReport.user_id == str(current_user.id)
-    ).sort("-report_date").to_list()
-    
-    logs = await HealthLog.find(
-        HealthLog.user_id == str(current_user.id)
-    ).sort("-log_date").limit(30).to_list()
-    
-    # Generate PDF
-    pdf_bytes = PDFService.generate_health_summary(
-        user=current_user,
-        reports=reports,
-        logs=logs
-    )
-    
-    # Return as downloadable file
-    filename = f"health_summary_{current_user.full_name.replace(' ', '_')}_{datetime.utcnow().strftime('%Y%m%d')}.pdf"
-    
-    return StreamingResponse(
-        io.BytesIO(pdf_bytes),
-        media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename={filename}"
-        }
-    )

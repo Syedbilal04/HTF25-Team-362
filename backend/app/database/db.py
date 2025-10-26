@@ -21,19 +21,20 @@ class Database:
             from app.models.user_model import User
             from app.models.report_model import HealthReport
             from app.models.healthlog_model import HealthLog
+            from app.models.insight_model import HealthInsight
             
             # Initialize beanie with models
             await init_beanie(
                 database=cls.client[settings.DATABASE_NAME],
-                document_models=[User, HealthReport, HealthLog]
+                document_models=[User, HealthReport, HealthLog, HealthInsight]
             )
             
-            logger.info("✅ Connected to MongoDB successfully!")
-            print(f"✅ Database connected: {settings.DATABASE_NAME}")
+            logger.info("Connected to MongoDB successfully!")
+            print(f"Database connected: {settings.DATABASE_NAME}")
             
         except Exception as e:
-            logger.error(f"❌ Database connection failed: {str(e)}")
-            print(f"❌ Database connection failed: {str(e)}")
+            logger.error(f"Database connection failed: {str(e)}")
+            print(f"Database connection failed: {str(e)}")
             raise e
     
     @classmethod

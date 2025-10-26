@@ -33,28 +33,59 @@ export default function Login() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #f0fdfa, #ffffff, #f8fafc)',
+      background: '#fafbfc',
+      backgroundImage: 'radial-gradient(at 0% 0%, rgba(20, 184, 166, 0.05) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.05) 0px, transparent 50%)',
       padding: '20px'
     }}>
       <div style={{
         background: 'white',
-        padding: '48px',
-        borderRadius: '20px',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.1)',
-        maxWidth: '450px',
+        padding: '56px',
+        borderRadius: '28px',
+        boxShadow: '0 24px 80px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)',
+        maxWidth: '460px',
         width: '100%'
       }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '32px'
+        }}>
+          <div style={{
+            width: '72px',
+            height: '72px',
+            background: 'linear-gradient(135deg, #0ea5e9, #14b8a6)',
+            borderRadius: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '36px',
+            marginBottom: '20px'
+          }}>
+            🏥
+          </div>
+        </div>
+        
         <h1 style={{
           fontSize: '32px',
-          fontWeight: 'bold',
+          fontWeight: '800',
           marginBottom: '8px',
-          background: 'linear-gradient(135deg, #14b8a6, #0d9488)',
+          textAlign: 'center',
+          background: 'linear-gradient(135deg, #0ea5e9, #14b8a6)',
           WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
+          WebkitTextFillColor: 'transparent',
+          letterSpacing: '-0.5px'
         }}>
-          🏥 HealthRecord
+          HealthRecord Pro
         </h1>
-        <p style={{ marginBottom: '32px', color: '#64748b' }}>Sign in to your account</p>
+        <p style={{ 
+          marginBottom: '40px', 
+          color: '#64748b', 
+          textAlign: 'center',
+          fontSize: '16px'
+        }}>
+          Sign in to access your health records
+        </p>
 
         {error && (
           <div style={{
@@ -78,11 +109,20 @@ export default function Login() {
             required
             style={{
               width: '100%',
-              padding: '12px',
+              padding: '14px 16px',
               marginBottom: '16px',
-              border: '1px solid #e2e8f0',
-              borderRadius: '8px',
-              fontSize: '14px'
+              border: '2px solid #e2e8f0',
+              borderRadius: '12px',
+              fontSize: '15px',
+              transition: 'all 0.2s'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = '#14b8a6'
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20, 184, 166, 0.1)'
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = '#e2e8f0'
+              e.currentTarget.style.boxShadow = 'none'
             }}
           />
           <input
@@ -93,11 +133,20 @@ export default function Login() {
             required
             style={{
               width: '100%',
-              padding: '12px',
-              marginBottom: '24px',
-              border: '1px solid #e2e8f0',
-              borderRadius: '8px',
-              fontSize: '14px'
+              padding: '14px 16px',
+              marginBottom: '32px',
+              border: '2px solid #e2e8f0',
+              borderRadius: '12px',
+              fontSize: '15px',
+              transition: 'all 0.2s'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = '#14b8a6'
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20, 184, 166, 0.1)'
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = '#e2e8f0'
+              e.currentTarget.style.boxShadow = 'none'
             }}
           />
           <button
@@ -105,14 +154,16 @@ export default function Login() {
             disabled={loading}
             style={{
               width: '100%',
-              padding: '12px',
-              background: 'linear-gradient(135deg, #14b8a6, #0d9488)',
+              padding: '16px',
+              background: loading ? '#94a3b8' : 'linear-gradient(135deg, #14b8a6, #0d9488)',
               color: 'white',
               border: 'none',
-              borderRadius: '8px',
-              fontWeight: 'bold',
+              borderRadius: '12px',
+              fontWeight: '700',
+              fontSize: '16px',
               cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.7 : 1
+              transition: 'all 0.2s',
+              boxShadow: '0 4px 12px rgba(20, 184, 166, 0.3)'
             }}
           >
             {loading ? '⏳ Signing in...' : '🔐 Sign In'}

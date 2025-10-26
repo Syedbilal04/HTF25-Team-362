@@ -21,7 +21,7 @@ from app.routes.ai_routes import router as ai_router
 async def lifespan(app: FastAPI):
     # Startup
     print("=" * 50)
-    print("🚀 Starting Personal Health Record System...")
+    print("Starting Personal Health Record System...")
     print("=" * 50)
     
     # Connect to database
@@ -31,22 +31,22 @@ async def lifespan(app: FastAPI):
     try:
         await AuthService.create_admin_user()
     except Exception as e:
-        print(f"⚠️  Error creating admin user: {e}")
+        print(f"Warning: Error creating admin user: {e}")
     
     print("=" * 50)
-    print("✅ Application started successfully!")
-    print(f"📍 API Docs: http://{settings.HOST}:{settings.PORT}/docs")
-    print(f"📍 Health Check: http://{settings.HOST}:{settings.PORT}/health")
+    print("Application started successfully!")
+    print(f"API Docs: http://{settings.HOST}:{settings.PORT}/docs")
+    print(f"Health Check: http://{settings.HOST}:{settings.PORT}/health")
     print("=" * 50)
     
     yield
     
     # Shutdown
     print("\n" + "=" * 50)
-    print("👋 Shutting down application...")
+    print("Shutting down application...")
     print("=" * 50)
     await db.close_db()
-    print("✅ Shutdown complete")
+    print("Shutdown complete")
 
 
 # Initialize FastAPI app with lifespan

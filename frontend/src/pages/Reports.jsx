@@ -10,6 +10,7 @@ export default function Reports() {
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [generatingReport, setGeneratingReport] = useState(false)
 
   useEffect(() => {
     fetchReports()
@@ -38,6 +39,31 @@ export default function Reports() {
     }
   }
 
+  const generateHealthReport = async () => {
+    setGeneratingReport(true)
+    try {
+      const response = await api.get('/api/reports/export-summary', {
+        responseType: 'blob' // Important for downloading files
+      })
+      
+      // Create blob and download
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `health_report_${user.full_name.replace(' ', '_')}_${new Date().toISOString().split('T')[0]}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error generating report:', error)
+      alert('Failed to generate health report')
+    } finally {
+      setGeneratingReport(false)
+    }
+  }
+
   if (!user) return <LoadingSpinner />
 
   return (
@@ -46,20 +72,58 @@ export default function Reports() {
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
           <h2 style={{ fontSize: '28px', fontWeight: 'bold' }}>Medical Reports</h2>
-          <button 
-            onClick={() => setShowForm(!showForm)}
-            style={{
-              background: 'linear-gradient(135deg, #14b8a6, #0d9488)',
-              color: 'white',
-              border: 'none',
-              padding: '12px 24px',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-          >
-            {showForm ? '❌ Cancel' : '📄 Upload Report'}
-          </button>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button 
+              onClick={generateHealthReport}
+              disabled={generatingReport}
+              style={{
+                background: generatingReport 
+                  ? '#94a3b8' 
+                  : 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                color: 'white',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                cursor: generatingReport ? 'not-allowed' : 'pointer',
+                opacity: generatingReport ? 0.6 : 1
+              }}
+            >
+              {generatingReport ? '⏳ Generating...' : '📋 Generate Health Report'}
+            </button>
+            <button 
+              onClick={() => setShowForm(!showForm)}
+              style={{
+                background: 'linear-gradient(135deg, #14b8a6, #0d9488)',
+                color: 'white',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+            >
+              {showForm ? '❌ Cancel' : '📄 Upload Report'}
+            </button>
+          </div>
+        </div>
+
+        {/* Info Banner for Generated Reports */}
+        <div style={{
+          background: 'linear-gradient(135deg, #dbeafe, #bfdbfe)',
+          border: '2px solid #3b82f6',
+          borderRadius: '12px',
+          padding: '20px',
+          marginBottom: '24px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '24px' }}>📋</span>
+            <h3 style={{ margin: 0, color: '#1e40af', fontSize: '18px' }}>Generate Health Report</h3>
+          </div>
+          <p style={{ color: '#1e3a8a', margin: 0, fontSize: '14px' }}>
+            Click "Generate Health Report" to create a comprehensive PDF document containing your health logs, vital signs, 
+            symptoms, and medical reports. This professional document can be shared with your doctor for appointments.
+          </p>
         </div>
 
         {showForm && <UploadReportForm onSuccess={() => { setShowForm(false); fetchReports(); }} />}

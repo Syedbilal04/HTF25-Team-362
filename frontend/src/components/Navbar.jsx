@@ -12,35 +12,79 @@ export default function Navbar() {
 
   return (
     <nav style={{
-      background: 'linear-gradient(135deg, #14b8a6, #0d9488)',
-      padding: '16px 0',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+      background: 'linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%)',
+      padding: '1rem 0',
+      boxShadow: '0 4px 20px rgba(14, 165, 233, 0.15)',
+      borderBottom: '1px solid rgba(255,255,255,0.1)'
     }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Link to="/dashboard" style={{ textDecoration: 'none', color: 'white' }}>
-          <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>🏥 HealthRecord</h1>
+      <div style={{ 
+        maxWidth: '1400px', 
+        margin: '0 auto', 
+        padding: '0 24px', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center' 
+      }}>
+        <Link to="/dashboard" style={{ textDecoration: 'none', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            background: 'rgba(255,255,255,0.2)',
+            borderRadius: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '20px'
+          }}>🏥</div>
+          <h1 style={{ margin: 0, fontSize: '22px', fontWeight: '700', letterSpacing: '-0.5px' }}>
+            HealthRecord Pro
+          </h1>
         </Link>
         
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <Link to="/dashboard" style={{ color: 'white', textDecoration: 'none', fontWeight: '500' }}>Dashboard</Link>
-          <Link to="/logs" style={{ color: 'white', textDecoration: 'none', fontWeight: '500' }}>Logs</Link>
-          <Link to="/reports" style={{ color: 'white', textDecoration: 'none', fontWeight: '500' }}>Reports</Link>
-          <Link to="/insights" style={{ color: 'white', textDecoration: 'none', fontWeight: '500' }}>Insights</Link>
-          <Link to="/profile" style={{ color: 'white', textDecoration: 'none', fontWeight: '500' }}>Profile</Link>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <NavLink to="/dashboard" label="📊 Dashboard" />
+          <NavLink to="/logs" label="📝 Logs" />
+          <NavLink to="/reports" label="📄 Reports" />
+          <NavLink to="/insights" label="🤖 Insights" />
+          <NavLink to="/profile" label="👤 Profile" />
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: '16px', paddingLeft: '16px', borderLeft: '1px solid rgba(255,255,255,0.3)' }}>
-            <span style={{ color: 'white', fontSize: '14px' }}>👤 {user?.full_name}</span>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '12px', 
+            marginLeft: '16px', 
+            paddingLeft: '16px', 
+            borderLeft: '1px solid rgba(255,255,255,0.2)' 
+          }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '16px'
+            }}>👤</div>
+            <span style={{ color: 'white', fontSize: '14px', fontWeight: '500' }}>
+              {user?.full_name?.split(' ')[0]}
+            </span>
             <button 
               onClick={handleLogout}
               style={{
-                background: 'rgba(255,255,255,0.2)',
-                border: '1px solid white',
+                background: 'rgba(255,255,255,0.15)',
+                border: '1px solid rgba(255,255,255,0.3)',
                 color: 'white',
                 padding: '8px 16px',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 cursor: 'pointer',
-                fontWeight: '500'
+                fontWeight: '600',
+                fontSize: '14px',
+                transition: 'all 0.2s ease',
+                backdropFilter: 'blur(10px)'
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.25)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)' }}
             >
               Logout
             </button>
@@ -48,5 +92,34 @@ export default function Navbar() {
         </div>
       </div>
     </nav>
+  )
+}
+
+function NavLink({ to, label }) {
+  const pathname = window.location.pathname
+  const isActive = pathname === to
+  
+  return (
+    <Link 
+      to={to} 
+      style={{ 
+        color: 'white',
+        textDecoration: 'none', 
+        fontWeight: '500',
+        fontSize: '15px',
+        padding: '8px 16px',
+        borderRadius: '8px',
+        background: isActive ? 'rgba(255,255,255,0.2)' : 'transparent',
+        transition: 'all 0.2s ease'
+      }}
+      onMouseEnter={(e) => {
+        if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
+      }}
+      onMouseLeave={(e) => {
+        if (!isActive) e.currentTarget.style.background = 'transparent'
+      }}
+    >
+      {label}
+    </Link>
   )
 }
