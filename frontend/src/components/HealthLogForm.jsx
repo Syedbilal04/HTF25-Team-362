@@ -3,28 +3,38 @@ import { logService } from '../services/logService'
 
 export default function HealthLogForm({ onSuccess }) {
   const [formData, setFormData] = useState({
-    symptoms: [],
-    mood: 5,
-    sleep_hours: 8,
-    pain_level: 0,
-    temperature: '',
-    blood_pressure_systolic: '',
-    blood_pressure_diastolic: '',
+    // Patient and Doctor Info
+    patient_name: '',
+    doctor_name: '',
+    
+    // Vitals
+    temperature: '37.0',
+    blood_pressure_systolic: '120',
+    blood_pressure_diastolic: '80',
+    
+    // Symptoms (booleans)
+    has_fever: false,
+    has_cough: false,
+    has_headache: false,
+    has_fatigue: false,
+    has_body_pain: false,
+    has_nausea: false,
+    
+    // Mood and Pain
+    mood: 'okay',  // Enum: 'excellent', 'good', 'okay', 'low'
+    pain_level: 'none',  // Enum: 'none', 'mild', 'moderate', 'severe', 'critical'
+    
+    // Lifestyle
+    sleep_hours: '7.5',
+    sleep_quality: 5,
+    stress_level: 5,
+    anxiety_level: 5,
+    
+    // Notes
     notes: ''
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
-  const commonSymptoms = ['headache', 'fever', 'cough', 'fatigue', 'nausea', 'back_pain', 'joint_pain', 'dizziness']
-
-  const handleSymptomChange = (symptom) => {
-    setFormData(prev => ({
-      ...prev,
-      symptoms: prev.symptoms.includes(symptom)
-        ? prev.symptoms.filter(s => s !== symptom)
-        : [...prev.symptoms, symptom]
-    }))
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -32,19 +42,52 @@ export default function HealthLogForm({ onSuccess }) {
     setError('')
 
     try {
-      await logService.createLog({
-        ...formData,
-        date: new Date().toISOString().split('T')[0]
-      })
+      // Prepare data for backend with proper types and all required fields
+      const logData = {
+        patient_name: formData.patient_name || null,
+        doctor_name: formData.doctor_name || null,
+        temperature: formData.temperature ? parseFloat(formData.temperature) : null,
+        blood_pressure_systolic: formData.blood_pressure_systolic ? parseInt(formData.blood_pressure_systolic) : null,
+        blood_pressure_diastolic: formData.blood_pressure_diastolic ? parseInt(formData.blood_pressure_diastolic) : null,
+        has_fever: formData.has_fever,
+        has_cough: formData.has_cough,
+        has_headache: formData.has_headache,
+        has_fatigue: formData.has_fatigue,
+        has_body_pain: formData.has_body_pain,
+        has_nausea: formData.has_nausea,
+        mood: formData.mood,
+        pain_level: formData.pain_level,
+        sleep_hours: formData.sleep_hours ? parseFloat(formData.sleep_hours) : null,
+        sleep_quality: parseInt(formData.sleep_quality),
+        stress_level: parseInt(formData.stress_level),
+        anxiety_level: parseInt(formData.anxiety_level),
+        notes: formData.notes || null
+      }
+      
+      console.log('Sending log data:', logData)
+      
+      await logService.createLog(logData)
       onSuccess && onSuccess()
+      
+      // Reset form
       setFormData({
-        symptoms: [],
-        mood: 5,
-        sleep_hours: 8,
-        pain_level: 0,
-        temperature: '',
-        blood_pressure_systolic: '',
-        blood_pressure_diastolic: '',
+        patient_name: '',
+        doctor_name: '',
+        temperature: '37.0',
+        blood_pressure_systolic: '120',
+        blood_pressure_diastolic: '80',
+        has_fever: false,
+        has_cough: false,
+        has_headache: false,
+        has_fatigue: false,
+        has_body_pain: false,
+        has_nausea: false,
+        mood: 'okay',
+        pain_level: 'none',
+        sleep_hours: '7.5',
+        sleep_quality: 5,
+        stress_level: 5,
+        anxiety_level: 5,
         notes: ''
       })
     } catch (err) {
@@ -80,54 +123,130 @@ export default function HealthLogForm({ onSuccess }) {
       )}
 
       <form onSubmit={handleSubmit}>
+        {/* Patient and Doctor Info */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+              Patient Name
+            </label>
+            <input
+              type="text"
+              value={formData.patient_name}
+              onChange={(e) => setFormData({...formData, patient_name: e.target.value})}
+              placeholder="Patient name"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                fontSize: '14px'
+              }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+              Doctor Name
+            </label>
+            <input
+              type="text"
+              value={formData.doctor_name}
+              onChange={(e) => setFormData({...formData, doctor_name: e.target.value})}
+              placeholder="Doctor name"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                fontSize: '14px'
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Mood */}
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+            Mood
+          </label>
+          <select
+            value={formData.mood}
+            onChange={(e) => setFormData({...formData, mood: e.target.value})}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #e2e8f0',
+              borderRadius: '8px',
+              fontSize: '14px',
+              background: 'white'
+            }}
+          >
+            <option value="excellent">😄 Excellent</option>
+            <option value="good">😊 Good</option>
+            <option value="okay">😐 Okay</option>
+            <option value="low">😢 Low</option>
+          </select>
+        </div>
+
         {/* Symptoms */}
         <div style={{ marginBottom: '20px' }}>
           <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '12px' }}>
-            Symptoms (select all that apply)
+            Symptoms
           </label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '8px' }}>
-            {commonSymptoms.map(symptom => (
-              <label key={symptom} style={{ 
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px' }}>
+            {[
+              { key: 'has_fever', label: '🤒 Fever' },
+              { key: 'has_cough', label: '🤧 Cough' },
+              { key: 'has_headache', label: '💢 Headache' },
+              { key: 'has_fatigue', label: '😴 Fatigue' },
+              { key: 'has_body_pain', label: '🤕 Body Pain' },
+              { key: 'has_nausea', label: '🤢 Nausea' }
+            ].map(symptom => (
+              <label key={symptom.key} style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: '8px',
                 padding: '8px 12px',
-                background: formData.symptoms.includes(symptom) ? '#e6fffa' : '#f8fafc',
+                background: formData[symptom.key] ? '#e6fffa' : '#f8fafc',
                 borderRadius: '8px',
-                border: `1px solid ${formData.symptoms.includes(symptom) ? '#14b8a6' : '#e2e8f0'}`,
+                border: `1px solid ${formData[symptom.key] ? '#14b8a6' : '#e2e8f0'}`,
                 cursor: 'pointer',
                 fontSize: '12px'
               }}>
                 <input
                   type="checkbox"
-                  checked={formData.symptoms.includes(symptom)}
-                  onChange={() => handleSymptomChange(symptom)}
+                  checked={formData[symptom.key]}
+                  onChange={(e) => setFormData({...formData, [symptom.key]: e.target.checked})}
                   style={{ margin: 0 }}
                 />
-                {symptom.replace('_', ' ')}
+                {symptom.label}
               </label>
             ))}
           </div>
         </div>
 
-        {/* Mood Scale */}
+        {/* Pain Level */}
         <div style={{ marginBottom: '16px' }}>
           <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
-            Mood (1-10): {formData.mood}
+            Pain Level
           </label>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            value={formData.mood}
-            onChange={(e) => setFormData({...formData, mood: parseInt(e.target.value)})}
-            style={{ width: '100%' }}
-          />
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#64748b' }}>
-            <span>😢 Very Low</span>
-            <span>😐 Neutral</span>
-            <span>😊 Great</span>
-          </div>
+          <select
+            value={formData.pain_level}
+            onChange={(e) => setFormData({...formData, pain_level: e.target.value})}
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #e2e8f0',
+              borderRadius: '8px',
+              fontSize: '14px',
+              background: 'white'
+            }}
+          >
+            <option value="none">😌 None</option>
+            <option value="mild">😐 Mild</option>
+            <option value="moderate">😟 Moderate</option>
+            <option value="severe">😰 Severe</option>
+            <option value="critical">🚨 Critical</option>
+          </select>
         </div>
 
         {/* Sleep Hours */}
@@ -141,7 +260,8 @@ export default function HealthLogForm({ onSuccess }) {
             max="24"
             step="0.5"
             value={formData.sleep_hours}
-            onChange={(e) => setFormData({...formData, sleep_hours: parseFloat(e.target.value)})}
+            onChange={(e) => setFormData({...formData, sleep_hours: e.target.value})}
+            placeholder="e.g., 7.5"
             style={{
               width: '100%',
               padding: '12px',
@@ -152,37 +272,33 @@ export default function HealthLogForm({ onSuccess }) {
           />
         </div>
 
-        {/* Pain Level */}
+        {/* Sleep Quality */}
         <div style={{ marginBottom: '16px' }}>
           <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
-            Pain Level (0-10): {formData.pain_level}
+            Sleep Quality (1-10): {formData.sleep_quality}
           </label>
           <input
             type="range"
-            min="0"
+            min="1"
             max="10"
-            value={formData.pain_level}
-            onChange={(e) => setFormData({...formData, pain_level: parseInt(e.target.value)})}
+            value={formData.sleep_quality}
+            onChange={(e) => setFormData({...formData, sleep_quality: parseInt(e.target.value)})}
             style={{ width: '100%' }}
           />
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#64748b' }}>
-            <span>😌 No Pain</span>
-            <span>😰 Severe</span>
-          </div>
         </div>
 
         {/* Vitals */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', marginBottom: '16px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
-              Temperature (°F)
+              Temperature (°C)
             </label>
             <input
               type="number"
               step="0.1"
               value={formData.temperature}
               onChange={(e) => setFormData({...formData, temperature: e.target.value})}
-              placeholder="98.6"
+              placeholder="37.0"
               style={{
                 width: '100%',
                 padding: '12px',

@@ -3,7 +3,8 @@ import { reportService } from '../services/reportService'
 
 export default function UploadReportForm({ onSuccess }) {
   const [file, setFile] = useState(null)
-  const [reportType, setReportType] = useState('lab_report')
+  const [reportType, setReportType] = useState('lab_test')
+  const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -14,6 +15,10 @@ export default function UploadReportForm({ onSuccess }) {
       setError('Please select a file')
       return
     }
+    if (!title) {
+      setError('Please enter a title')
+      return
+    }
 
     setLoading(true)
     setError('')
@@ -21,12 +26,14 @@ export default function UploadReportForm({ onSuccess }) {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('report_type', reportType)
+    formData.append('title', title)
     formData.append('description', description)
 
     try {
       await reportService.uploadReport(formData)
       onSuccess && onSuccess()
       setFile(null)
+      setTitle('')
       setDescription('')
       setError('')
     } catch (err) {
@@ -78,12 +85,36 @@ export default function UploadReportForm({ onSuccess }) {
               background: 'white'
             }}
           >
-            <option value="lab_report">Lab Report</option>
+            <option value="lab_test">Lab Test</option>
             <option value="prescription">Prescription</option>
-            <option value="scan">Medical Scan</option>
-            <option value="consultation">Consultation Note</option>
+            <option value="xray">X-Ray</option>
+            <option value="mri">MRI</option>
+            <option value="ct_scan">CT Scan</option>
+            <option value="ultrasound">Ultrasound</option>
+            <option value="medical_certificate">Medical Certificate</option>
+            <option value="vaccination">Vaccination</option>
             <option value="other">Other</option>
           </select>
+        </div>
+
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
+            Title *
+          </label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g., Blood Test Report"
+            required
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #e2e8f0',
+              borderRadius: '8px',
+              fontSize: '14px'
+            }}
+          />
         </div>
 
         <div style={{ marginBottom: '16px' }}>
@@ -114,6 +145,7 @@ export default function UploadReportForm({ onSuccess }) {
             type="file"
             onChange={(e) => setFile(e.target.files[0])}
             accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+            required
             style={{
               width: '100%',
               padding: '12px',

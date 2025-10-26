@@ -6,10 +6,10 @@ import { authService } from "../services/authService"; // ✅ Correct path (if b
 
 export default function Register() {
   const [formData, setFormData] = useState({
-    full_name: "",
-    email: "",
-    password: "",
-    phone: ""
+    full_name: "John Doe",
+    email: "john@example.com",
+    password: "password123",
+    phone: "+1234567890"
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

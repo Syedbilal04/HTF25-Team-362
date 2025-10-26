@@ -4,8 +4,8 @@ import { useAuth } from '../context/AuthContext'
 import { authService } from '../services/authService'
 
 export default function Login() {
-  const [email, setEmail] = useState('test@example.com')
-  const [password, setPassword] = useState('Password123')
+  const [email, setEmail] = useState('syedinaam01@gmail.com')
+  const [password, setPassword] = useState('admin123')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const navigate = useNavigate()
@@ -13,6 +13,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    e.stopPropagation()
     setLoading(true)
     setError('')
 
@@ -22,7 +23,6 @@ export default function Login() {
       navigate('/dashboard')
     } catch (err) {
       setError(err.response?.data?.detail || 'Login failed')
-    } finally {
       setLoading(false)
     }
   }

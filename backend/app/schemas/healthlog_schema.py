@@ -8,6 +8,10 @@ class HealthLogCreate(BaseModel):
     """Schema for creating health log"""
     log_date: Optional[datetime] = None
     
+    # Patient and Doctor Info
+    patient_name: Optional[str] = None
+    doctor_name: Optional[str] = None
+    
     # Vitals
     temperature: Optional[float] = Field(None, ge=35.0, le=45.0)
     blood_pressure_systolic: Optional[int] = Field(None, ge=50, le=250)
@@ -55,3 +59,27 @@ class HealthLogUpdate(BaseModel):
 class HealthLogResponse(BaseModel):
     """Schema for health log response"""
     id: str
+    user_id: str
+    log_date: datetime
+    patient_name: Optional[str] = None
+    doctor_name: Optional[str] = None
+    temperature: Optional[float] = None
+    blood_pressure_systolic: Optional[int] = None
+    blood_pressure_diastolic: Optional[int] = None
+    has_fever: bool = False
+    has_cough: bool = False
+    has_headache: bool = False
+    has_fatigue: bool = False
+    has_body_pain: bool = False
+    has_nausea: bool = False
+    mood: MoodType
+    pain_level: SymptomSeverity
+    sleep_hours: Optional[float] = None
+    sleep_quality: int
+    stress_level: int
+    anxiety_level: int
+    notes: Optional[str] = None
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True

@@ -50,7 +50,7 @@ Format your response as JSON with keys: "trends", "correlations", "recommendatio
         
         try:
             response = client.chat.completions.create(
-                model="GPT-4o-mini",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "You are a helpful health analysis assistant. Provide clear, actionable insights."},
                     {"role": "user", "content": prompt}

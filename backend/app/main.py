@@ -28,7 +28,10 @@ async def lifespan(app: FastAPI):
     await db.connect_db()
     
     # Create admin user if not exists
-    await AuthService.create_admin_user()
+    try:
+        await AuthService.create_admin_user()
+    except Exception as e:
+        print(f"⚠️  Error creating admin user: {e}")
     
     print("=" * 50)
     print("✅ Application started successfully!")
@@ -154,6 +157,19 @@ async def get_stats():
             "error": "Database not connected",
             "message": str(e)
         }
+
+
+@app.get("/test-users", tags=["Debug"])
+async def test_users():
+    """Test endpoint to check users in database"""
+    from app.models.user_model import User
+    try:
+        users = await User.find_all().to_list()
+        return {
+            "users": [{"email": u.email, "full_name": u.full_name, "role": u.role.value} for u in users]
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 
 if __name__ == "__main__":

@@ -20,40 +20,48 @@ async def create_health_log(
     
     Track daily symptoms, vitals, mood, and lifestyle
     """
-    # Check if log for today already exists
+    # Use current time for log_date (allow multiple logs per day)
     log_date = log_data.log_date or datetime.utcnow()
     
-    existing_log = await HealthLog.find_one(
-        HealthLog.user_id == str(current_user.id),
-        HealthLog.log_date >= datetime(log_date.year, log_date.month, log_date.day),
-        HealthLog.log_date < datetime(log_date.year, log_date.month, log_date.day) + timedelta(days=1)
-    )
-    
-    if existing_log:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A log entry for today already exists. Use PUT to update it."
+    try:
+        # Create log
+        health_log = HealthLog(
+            user_id=str(current_user.id),
+            log_date=log_date,
+            **log_data.dict(exclude={'log_date'}),
+            created_at=datetime.utcnow()
         )
-    
-    # Create log
-    health_log = HealthLog(
-        user_id=str(current_user.id),
-        log_date=log_date,
-        **log_data.dict(exclude={'log_date'}),
-        created_at=datetime.utcnow()
-    )
-    
-    await health_log.insert()
+        
+        await health_log.insert()
+    except Exception as e:
+        print(f"Error creating log: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Failed to create log: {str(e)}"
+        )
     
     return HealthLogResponse(
         id=str(health_log.id),
         user_id=health_log.user_id,
         log_date=health_log.log_date,
+        patient_name=health_log.patient_name,
+        doctor_name=health_log.doctor_name,
         temperature=health_log.temperature,
-        mood=health_log.mood,
-        sleep_hours=health_log.sleep_hours,
+        blood_pressure_systolic=health_log.blood_pressure_systolic,
+        blood_pressure_diastolic=health_log.blood_pressure_diastolic,
         has_fever=health_log.has_fever,
+        has_cough=health_log.has_cough,
         has_headache=health_log.has_headache,
+        has_fatigue=health_log.has_fatigue,
+        has_body_pain=health_log.has_body_pain,
+        has_nausea=health_log.has_nausea,
+        mood=health_log.mood,
+        pain_level=health_log.pain_level,
+        sleep_hours=health_log.sleep_hours,
+        sleep_quality=health_log.sleep_quality,
+        stress_level=health_log.stress_level,
+        anxiety_level=health_log.anxiety_level,
+        notes=health_log.notes,
         created_at=health_log.created_at
     )
 
@@ -89,11 +97,24 @@ async def get_my_logs(
             id=str(log.id),
             user_id=log.user_id,
             log_date=log.log_date,
+            patient_name=log.patient_name,
+            doctor_name=log.doctor_name,
             temperature=log.temperature,
-            mood=log.mood,
-            sleep_hours=log.sleep_hours,
+            blood_pressure_systolic=log.blood_pressure_systolic,
+            blood_pressure_diastolic=log.blood_pressure_diastolic,
             has_fever=log.has_fever,
+            has_cough=log.has_cough,
             has_headache=log.has_headache,
+            has_fatigue=log.has_fatigue,
+            has_body_pain=log.has_body_pain,
+            has_nausea=log.has_nausea,
+            mood=log.mood,
+            pain_level=log.pain_level,
+            sleep_hours=log.sleep_hours,
+            sleep_quality=log.sleep_quality,
+            stress_level=log.stress_level,
+            anxiety_level=log.anxiety_level,
+            notes=log.notes,
             created_at=log.created_at
         )
         for log in logs

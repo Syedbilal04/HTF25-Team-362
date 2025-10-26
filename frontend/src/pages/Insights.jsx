@@ -13,11 +13,26 @@ export default function Insights() {
   const generateInsight = async () => {
     setLoading(true)
     setError('')
+    setInsight('')
     try {
-      const response = await api.post('/api/ai/generate-insight', {})
-      setInsight(response.data.insight)
+      // Use the correct endpoint that exists in backend
+      const response = await api.get('/api/ai/insights?days=30')
+      
+      // Format the response nicely
+      const data = response.data
+      let formatted = ''
+      
+      if (data.insights) {
+        formatted = `📊 AI Health Analysis\n\n${data.insights}\n\n`
+      }
+      
+      if (data.data_points_analyzed) {
+        formatted += `Analyzed ${data.data_points_analyzed} days of health data.`
+      }
+      
+      setInsight(formatted || JSON.stringify(data, null, 2))
     } catch (error) {
-      setError('Failed to generate insight. Please try again.')
+      setError('Failed to generate insight: ' + (error.response?.data?.detail || 'Please ensure you have health logs saved.'))
       console.error('Error generating insight:', error)
     } finally {
       setLoading(false)

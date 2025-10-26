@@ -69,16 +69,24 @@ export default function Logs() {
                 boxShadow: '0 4px 16px rgba(0,0,0,0.06)'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>{log.log_type}</h3>
+                  <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>
+                    Health Log - {log.mood || 'Daily Entry'}
+                  </h3>
                   <span style={{ color: '#64748b', fontSize: '14px' }}>
-                    {new Date(log.log_date).toLocaleDateString()}
+                    {log.log_date ? (() => {
+                      try {
+                        return new Date(log.log_date).toLocaleDateString()
+                      } catch {
+                        return 'Invalid Date'
+                      }
+                    })() : 'No date'}
                   </span>
                 </div>
-                <p style={{ color: '#64748b', marginBottom: '12px' }}>{log.notes}</p>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                  {log.blood_pressure && <span>🩺 BP: {log.blood_pressure}</span>}
-                  {log.weight && <span>⚖️ Weight: {log.weight} kg</span>}
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '8px' }}>
                   {log.temperature && <span>🌡️ Temp: {log.temperature}°C</span>}
+                  {log.sleep_hours && <span>😴 Sleep: {log.sleep_hours}hrs</span>}
+                  {log.has_fever && <span>🤒 Fever: Yes</span>}
+                  {log.has_headache && <span>💢 Headache: Yes</span>}
                 </div>
               </div>
             ))}

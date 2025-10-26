@@ -30,6 +30,10 @@ class HealthLog(Document):
     user_id: str = Field(..., index=True)
     log_date: datetime = Field(default_factory=datetime.utcnow, index=True)
     
+    # Patient and Doctor Info
+    patient_name: Optional[str] = None
+    doctor_name: Optional[str] = None
+    
     # Vital Signs
     temperature: Optional[float] = None  # In Celsius
     blood_pressure_systolic: Optional[int] = None
